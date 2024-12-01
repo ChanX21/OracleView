@@ -2,12 +2,7 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import Web3Modal from 'web3modal';
 import './App.css';
-import { 
-  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, 
-  ResponsiveContainer, RadarChart, Radar, PolarGrid, 
-  PolarAngleAxis, PolarRadiusAxis 
-} from 'recharts';
-import { Paper, Grid, Typography, Chip, Box } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 
 // You'll need to import your contract ABI and address
 const CONTRACT_ADDRESS = "0x62cdDA352b47D60B46fdf510BCBC1bd430DCb691";
@@ -18,11 +13,11 @@ const CONTRACT_ABI = [
 
 // Add this helper function after your imports
 const getViralityLevel = (score) => {
-  if (score >= 80) return "Viral Sensation! 🔥";
-  if (score >= 60) return "Trending Up! 📈";
-  if (score >= 40) return "Gaining Traction 📊";
-  if (score >= 20) return "Building Momentum 🌱";
-  return "Starting Out 🌟";
+  if (score >= 80) return "🔥 VIRAL SENSATION!";
+  if (score >= 60) return "⚡ TRENDING UP!";
+  if (score >= 40) return "📈 GAINING TRACTION";
+  if (score >= 20) return "💫 BUILDING MOMENTUM";
+  return "🌱 STARTING OUT";
 };
 
 function App() {
@@ -104,163 +99,30 @@ function App() {
     }
   }, []);
 
-  // Add this function to parse metadata into categories
-  const parseMetadata = (metadata) => {
-    const categories = metadata.split(',').map(item => item.trim());
-    return categories.map(category => ({
-      name: category,
-      value: Math.floor(Math.random() * 100) // In a real app, these values would come from your oracle
-    }));
-  };
-
-  // Update the score card section in your ResultsDisplay component
-  const ScoreCard = ({ score }) => {
+  const ScoreDisplay = ({ score, metadata }) => {
     const viralityLevel = getViralityLevel(score);
-    const dots = 5;
-    const activeDots = Math.ceil((score / 100) * dots);
+    const topics = metadata.split(',').map(t => t.trim());
 
     return (
-      <Paper className="score-card">
-        <div className="score-container">
-          <Typography variant="h3" className="score-value">
-            {score}/100
-          </Typography>
-          <Typography variant="h6" className="virality-label">
-            {viralityLevel}
-          </Typography>
-          <div className="virality-indicator">
-            {[...Array(dots)].map((_, i) => (
-              <div
-                key={i}
-                className={`indicator-dot ${i < activeDots ? 'active' : ''}`}
-              />
-            ))}
+      <div className="score-dashboard">
+        <Paper className="score-card">
+          <div className="score-container">
+            <div className="flame-effect"></div>
+            <Typography variant="h1" className="score-value">
+              {score}
+            </Typography>
+            <Typography variant="h3" className="virality-label">
+              {viralityLevel}
+            </Typography>
+            <div className="topics-container">
+              {topics.map((topic, index) => (
+                <span key={index} className="topic-tag">
+                  {topic}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-        <svg className="flame-icon" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <radialGradient id="flame-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.8)" />
-              <stop offset="100%" stopColor="rgba(255,69,0,0)" />
-            </radialGradient>
-          </defs>
-          <circle cx="50" cy="50" r="45" fill="url(#flame-gradient)">
-            <animate
-              attributeName="r"
-              values="45;47;45"
-              dur="2s"
-              repeatCount="indefinite"
-            />
-          </circle>
-        </svg>
-      </Paper>
-    );
-  };
-
-  // Modify the results display section
-  const ResultsDisplay = ({ analysisResult }) => {
-    if (!analysisResult) return null;
-
-    const categories = parseMetadata(analysisResult.metadata);
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
-    return (
-      <div className="results-dashboard">
-        <Typography variant="h4" gutterBottom>
-          Analysis Results
-        </Typography>
-        
-        <Grid container spacing={3}>
-          {/* Overall Score Card */}
-          <Grid item xs={12}>
-            <ScoreCard score={analysisResult.score} />
-          </Grid>
-
-          {/* Keywords/Categories */}
-          <Grid item xs={12}>
-            <Paper className="keywords-section">
-              <Typography variant="h6" gutterBottom>
-                Key Topics
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {categories.map((category, index) => (
-                  <Chip
-                    key={index}
-                    label={category.name}
-                    color="primary"
-                    variant="outlined"
-                  />
-                ))}
-              </Box>
-            </Paper>
-          </Grid>
-
-          {/* Pie Chart */}
-          <Grid item xs={12} md={6}>
-            <Paper className="chart-container">
-              <Typography variant="h6" className="chart-title">Topic Distribution</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={categories}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label={({name, value}) => `${name}: ${value}`}
-                  >
-                    {categories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#282c34', border: 'none' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-
-          {/* Radar Chart */}
-          <Grid item xs={12} md={6}>
-            <Paper className="chart-container">
-              <Typography variant="h6" className="chart-title">Content Analysis</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={categories}>
-                  <PolarGrid stroke="#666" />
-                  <PolarAngleAxis dataKey="name" tick={{ fill: '#333', fontSize: 12 }} />
-                  <PolarRadiusAxis tick={{ fill: '#333' }} />
-                  <Radar
-                    name="Topics"
-                    dataKey="value"
-                    stroke="#8884d8"
-                    fill="#8884d8"
-                    fillOpacity={0.6}
-                  />
-                  <Tooltip contentStyle={{ backgroundColor: '#282c34', border: 'none' }} />
-                </RadarChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-
-          {/* Bar Chart */}
-          <Grid item xs={12}>
-            <Paper className="chart-container">
-              <Typography variant="h6" className="chart-title">Topic Strength</Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={categories}>
-                  <XAxis dataKey="name" tick={{ fill: '#333' }} />
-                  <YAxis tick={{ fill: '#333' }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#282c34', border: 'none' }} />
-                  <Bar dataKey="value" fill="#8884d8">
-                    {categories.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </Paper>
-          </Grid>
-        </Grid>
+        </Paper>
       </div>
     );
   };
@@ -268,7 +130,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>YouTube Video Analyzer</h1>
+        <h1>YouTube Virality Oracle</h1>
         
         {/* Wallet Connection */}
         <div className="wallet-section">
@@ -283,7 +145,7 @@ function App() {
         
         {/* Request Analysis Form */}
         <div className="analysis-section">
-          <h2>Request New Analysis</h2>
+          <h2>Check Video Virality</h2>
           <form onSubmit={handleRequestAnalysis}>
             <input
               type="text"
@@ -293,7 +155,7 @@ function App() {
               required
             />
             <button type="submit" disabled={!account}>
-              Request Analysis
+              Analyze Video
             </button>
           </form>
         </div>
@@ -310,12 +172,17 @@ function App() {
               required
             />
             <button type="submit" disabled={!account}>
-              Get Analysis
+              Get Results
             </button>
           </form>
 
           {/* Results Display */}
-          {analysisResult && <ResultsDisplay analysisResult={analysisResult} />}
+          {analysisResult && (
+            <ScoreDisplay 
+              score={analysisResult.score} 
+              metadata={analysisResult.metadata}
+            />
+          )}
         </div>
       </header>
     </div>

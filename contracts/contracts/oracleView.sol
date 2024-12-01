@@ -9,9 +9,15 @@ contract YoutubeAnalyzer is Ownable {
     event AnalysisReceived(string videoId, string metadata, uint256 score);
 
     // Structs
+    struct TopicScore {
+        string topic;
+        uint256 relevance;
+    }
+
     struct Analysis {
-        string metadata;
-        uint256 score;
+        string[] topics;
+        uint256[] scores;
+        uint256 overallScore;
         bool exists;
     }
 
@@ -49,8 +55,9 @@ contract YoutubeAnalyzer is Ownable {
         require(score <= 100, "Score must be between 0 and 100");
 
         analyses[videoId] = Analysis({
-            metadata: metadata,
-            score: score,
+            topics: metadata.split(','),
+            scores: metadata.split(',').map(item => uint256(item.trim())),
+            overallScore: score,
             exists: true
         });
 
@@ -60,9 +67,9 @@ contract YoutubeAnalyzer is Ownable {
     function getAnalysis(string calldata videoId) 
         external 
         view 
-        returns (string memory metadata, uint256 score, bool exists) 
+        returns (string[] memory topics, uint256[] memory scores, uint256 overallScore, bool exists) 
     {
         Analysis memory analysis = analyses[videoId];
-        return (analysis.metadata, analysis.score, analysis.exists);
+        return (analysis.topics, analysis.scores, analysis.overallScore, analysis.exists);
     }
 } 
