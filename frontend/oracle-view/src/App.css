@@ -203,20 +203,22 @@ button:disabled {
 }
 
 .wallet-section {
-  margin-bottom: 30px;
-  padding: 15px;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-right: 20px;
 }
 
 .account-info {
-  background: linear-gradient(145deg, #1a1a1a, #222222);
-  padding: 12px 25px;
-  border-radius: 10px;
-  border: 1px solid #333;
-  color: var(--primary-red);
-  font-family: monospace;
-  font-size: 1.1rem;
-  font-family: var(--font-display);
-  letter-spacing: 0.5px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 button:disabled {
@@ -584,9 +586,9 @@ h1::before {
 
 /* Wallet Section */
 .wallet-icon {
-  width: 28px;
-  height: 28px;
-  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
   object-fit: contain;
 }
 
@@ -890,7 +892,8 @@ h1::before {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 20px 40px;
+  padding: 0 40px;
+  height: 80px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -900,13 +903,14 @@ h1::before {
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 80px;
   box-shadow: 
     0 4px 30px rgba(0, 0, 0, 0.1),
     0 0 20px rgba(255, 51, 51, 0.1),
     0 0 40px rgba(255, 51, 51, 0.05);
   transition: all 0.3s ease;
   animation: headerGlow 4s infinite alternate;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .header-container:hover {
@@ -937,6 +941,8 @@ h1::before {
   display: flex;
   align-items: center;
   gap: 24px;
+  height: 100%;
+  padding: 0 20px;
 }
 
 /* Updated Base Badge Styles */
@@ -1051,5 +1057,224 @@ h1::before {
     box-shadow: 
       0 0 25px rgba(255, 51, 51, 0.15),
       0 0 50px rgba(255, 51, 51, 0.1);
+  }
+}
+
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Enhanced Logo Styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.logo-symbol {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, var(--primary-red), var(--accent-red));
+  border-radius: 12px;
+  position: relative;
+  transform: rotate(45deg);
+  animation: logoFloat 6s ease-in-out infinite;
+  box-shadow: 
+    0 0 30px rgba(255, 51, 51, 0.3),
+    0 0 60px rgba(255, 51, 51, 0.1);
+}
+
+.logo-symbol::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background: var(--background-dark);
+  border-radius: 8px;
+}
+
+.logo-symbol::after {
+  content: '';
+  position: absolute;
+  inset: 15px;
+  background: var(--primary-red);
+  border-radius: 4px;
+  animation: pulse 2s infinite;
+}
+
+.logo {
+  font-family: var(--font-display) !important;
+  font-size: 2.8rem !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: linear-gradient(45deg, #ffffff, #ff6b6b) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  position: relative;
+  text-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+  animation: textGlow 3s infinite alternate;
+}
+
+/* Modern Animations */
+@keyframes logoFloat {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); }
+  50% { transform: rotate(45deg) translate(0, -10px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes textGlow {
+  0% { text-shadow: 0 0 30px rgba(255, 51, 51, 0.3); }
+  100% { text-shadow: 0 0 50px rgba(255, 51, 51, 0.5); }
+}
+
+/* Enhanced Info Cards */
+.info-card {
+  background: linear-gradient(145deg, rgba(26, 26, 26, 0.8), rgba(34, 34, 34, 0.8));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 51, 51, 0.2);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 51, 51, 0.1);
+  animation: cardFloat 6s ease-in-out infinite;
+}
+
+.info-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: rgba(255, 51, 51, 0.4);
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(255, 51, 51, 0.2);
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Enhanced Input Fields */
+.input-wrapper input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 51, 51, 0.2);
+  backdrop-filter: blur(10px);
+  font-family: var(--font-primary);
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.input-wrapper input:focus {
+  border-color: var(--primary-red);
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Enhanced Buttons */
+button {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(45deg, var(--primary-red), var(--accent-red));
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+/* Page Background Enhancement */
+.App-header::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 100% 50%, transparent 20%, var(--circuit-color) 21%, var(--circuit-color) 34%, transparent 35%, transparent),
+    radial-gradient(circle at 0% 50%, transparent 20%, var(--circuit-color) 21%, var(--circuit-color) 34%, transparent 35%, transparent) 0 -50px;
+  background-size: 75px 100px;
+  opacity: 0.3;
+  animation: backgroundShift 30s linear infinite;
+}
+
+@keyframes backgroundShift {
+  0% { background-position: 0 0; }
+  100% { background-position: 75px 100px; }
+}
+
+/* Add these new styles for modern text */
+h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.5px;
+  background: linear-gradient(45deg, #ffffff, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 3s infinite linear;
+}
+
+@keyframes textShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .header-container {
+    padding: 20px;
+  }
+
+  .header-right {
+    gap: 16px;
+  }
+
+  .powered-by-base {
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    height: auto;
+    padding: 16px;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+    padding-right: 0;
+  }
+
+  .wallet-section {
+    margin-left: 0;
+  }
+
+  .powered-by-base {
+    margin-left: 0;
   }
 }
