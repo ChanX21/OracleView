@@ -668,3 +668,106 @@ h1::before {
     align-items: center;
   }
 }
+
+.network-selector {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.network-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.network-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.network-button.active {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.2);
+}
+
+.network-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.multi-chain-results {
+  margin-top: 2rem;
+}
+
+.chain-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.chain-result-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.chain-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chain-icon {
+  font-size: 1.5rem;
+}
+
+.score-dashboard.compact .score-card {
+  padding: 1rem;
+}
+
+.score-dashboard.compact .score-value {
+  font-size: 2.5rem;
+}
+
+.score-dashboard.compact .virality-label {
+  font-size: 1rem;
+}
+
+.analysis-options {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.network-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.analysis-result {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid var(--primary-red);
+}

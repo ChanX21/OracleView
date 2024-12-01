@@ -5,7 +5,7 @@ require('dotenv').config();
 // Import ABI from the abi file
 const CONTRACT_ABI = require('./abi/abi.js');
 
-// Network configurations
+// Network configurations - Use environment variables
 const NETWORKS = {
     sepolia: {
         name: 'Sepolia',
@@ -13,11 +13,11 @@ const NETWORKS = {
         contractAddress: process.env.SEPOLIA_CONTRACT_ADDRESS,
         chainId: 11155111
     },
-    base: {
-        name: 'Base',
+    baseSepolia: {
+        name: 'Base Sepolia',
         rpc: process.env.BASE_RPC_URL,
         contractAddress: process.env.BASE_CONTRACT_ADDRESS,
-        chainId: 84531  // Base Testnet
+        chainId: 84531
     }
 };
 
@@ -32,7 +32,11 @@ class OracleService {
             try {
                 const provider = new ethers.providers.JsonRpcProvider(networkConfig.rpc);
                 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-                const contract = new ethers.Contract(networkConfig.contractAddress, CONTRACT_ABI, wallet);
+                const contract = new ethers.Contract(
+                    networkConfig.contractAddress,
+                    CONTRACT_ABI,
+                    wallet
+                );
 
                 this.networks[networkName] = {
                     provider,
@@ -41,11 +45,70 @@ class OracleService {
                     config: networkConfig
                 };
 
-                console.log(`✅ Connected to ${networkName}`);
+                // Verify provider connection
+                provider.getNetwork().then(() => {
+                    console.log(`✅ Connected to ${networkName} at ${networkConfig.contractAddress}`);
+                    this.attachEventListeners(networkName);
+                }).catch(error => {
+                    console.error(`❌ Failed to connect to ${networkName}:`, error);
+                });
+
             } catch (error) {
                 console.error(`❌ Failed to setup ${networkName}:`, error);
             }
         }
+    }
+
+    attachEventListeners(networkName) {
+        const network = this.networks[networkName];
+        if (!network) return;
+
+        try {
+            // Remove any existing listeners
+            network.contract.removeAllListeners();
+
+            // Listen for AnalysisRequested events - Updated to match contract events
+            network.contract.on("AnalysisRequested", async (videoId, timestamp, event) => {
+                console.log(`\n🎥 New analysis request on ${networkName}:`);
+                console.log(`Video ID: ${videoId}`);
+                console.log(`Timestamp: ${timestamp}`);
+                console.log(`TX Hash: ${event.transactionHash}`);
+
+                try {
+                    // Process the videoId directly as it's already a string in the contract
+                    console.log('Processing Video ID:', videoId);
+                    
+                    // Validate YouTube video ID format
+                    if (!this.isValidYouTubeId(videoId)) {
+                        throw new Error(`Invalid YouTube video ID format: ${videoId}`);
+                    }
+
+                    await this.processAnalysisRequest(videoId, networkName);
+                } catch (error) {
+                    console.error(`Failed to process request on ${networkName}:`, error);
+                }
+            });
+
+            // Listen for AnalysisReceived events - Updated to match contract events
+            network.contract.on("AnalysisReceived", (videoId, metadata, score, event) => {
+                console.log(`\n📊 Analysis completed on ${networkName}:`);
+                console.log(`Video ID: ${videoId}`);
+                console.log(`Metadata: ${metadata}`);
+                console.log(`Score: ${score.toString()}`);
+                console.log(`TX Hash: ${event.transactionHash}`);
+            });
+
+            console.log(`✅ Event listeners attached for ${networkName}`);
+        } catch (error) {
+            console.error(`❌ Failed to attach event listeners for ${networkName}:`, error);
+        }
+    }
+
+    // Add helper method to validate YouTube ID
+    isValidYouTubeId(videoId) {
+        // YouTube IDs are 11 characters long and contain alphanumeric chars, underscores, and hyphens
+        const youtubeIdRegex = /^[a-zA-Z0-9_-]{11}$/;
+        return youtubeIdRegex.test(videoId);
     }
 
     async processAnalysisRequest(videoId, networkName) {
@@ -56,8 +119,13 @@ class OracleService {
         }
 
         try {
-            console.log(`Processing analysis for video ${videoId} on ${networkName}`);
+            console.log(`\n🎥 Processing analysis for video ${videoId} on ${networkName}`);
             
+            // Validate the video ID before making the API call
+            if (!this.isValidYouTubeId(videoId)) {
+                throw new Error(`Invalid YouTube video ID format: ${videoId}`);
+            }
+
             // Call our API
             const response = await axios.post('http://localhost:3000/analyze-video', {
                 videoId: videoId
@@ -71,14 +139,19 @@ class OracleService {
             const [metadata, scoreStr] = response.data.data.split('|');
             const score = parseInt(scoreStr);
 
-            console.log(`Submitting analysis to ${networkName}:`, {
+            console.log(`📊 Analysis results:`, {
                 videoId,
                 metadata,
-                score
+                score,
+                network: networkName
             });
 
             // Submit to blockchain
-            const tx = await network.contract.submitAnalysis(videoId, metadata, score);
+            const tx = await network.contract.submitAnalysis(videoId, metadata, score, {
+                gasLimit: 500000
+            });
+            
+            console.log(`⏳ Waiting for transaction confirmation...`);
             const receipt = await tx.wait();
             
             console.log(`✅ Analysis submitted on ${networkName}. Hash: ${receipt.transactionHash}`);
@@ -91,43 +164,6 @@ class OracleService {
 
     async startListening() {
         console.log('🚀 Starting Oracle Service on multiple networks...');
-
-        for (const [networkName, network] of Object.entries(this.networks)) {
-            try {
-                console.log(`📡 Listening on ${networkName}...`);
-                console.log(`Contract address: ${network.config.contractAddress}`);
-
-                // Listen for AnalysisRequested events
-                network.contract.on('AnalysisRequested', async (videoId, timestamp, event) => {
-                    console.log(`\n🎥 New analysis request on ${networkName}:`);
-                    console.log(`Video ID: ${videoId}`);
-                    console.log(`Timestamp: ${new Date(timestamp * 1000).toISOString()}`);
-                    console.log(`TX Hash: ${event.transactionHash}`);
-
-                    try {
-                        await this.processAnalysisRequest(videoId, networkName);
-                    } catch (error) {
-                        console.error(`Failed to process request on ${networkName}:`, error);
-                    }
-                });
-
-                // Listen for AnalysisReceived events
-                network.contract.on('AnalysisReceived', async (videoId, metadata, score, event) => {
-                    console.log(`\n📊 Analysis completed on ${networkName}:`);
-                    console.log(`Video ID: ${videoId}`);
-                    console.log(`Score: ${score}`);
-                    console.log(`TX Hash: ${event.transactionHash}`);
-                });
-
-            } catch (error) {
-                console.error(`❌ Failed to setup listeners for ${networkName}:`, error);
-            }
-        }
-    }
-
-    // Helper method to get contract instance for a specific network
-    getContract(networkName) {
-        return this.networks[networkName]?.contract;
     }
 }
 
