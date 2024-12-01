@@ -20,7 +20,7 @@ contract YoutubeAnalyzer is Ownable {
     address public oracleAddress;
 
     // Constructor
-    constructor() {
+    constructor() Ownable(msg.sender) {
         oracleAddress = msg.sender;
     }
 
