@@ -391,7 +391,7 @@ function App() {
           </div>
         </div>
         
-        {/* Request Analysis Form with Rich Content */}
+        {/* Request Analysis Form */}
         <div className="analysis-section">
           <div className="section-header">
             <img src={youtubeLogo} alt="YouTube" className="section-icon" />
@@ -426,7 +426,7 @@ function App() {
           </form>
         </div>
 
-        {/* Get Analysis Form with Rich Content */}
+        {/* Get Analysis Form */}
         <div className="analysis-section">
           <div className="section-header">
             <img src={analysisIcon} alt="Analysis" className="section-icon" />
@@ -473,6 +473,40 @@ function App() {
               </div>
             )}
           </form>
+        </div>
+
+        {/* Move How It Works section here */}
+        <div className="how-it-works-section">
+          <h2 className="section-title">How It Works</h2>
+          <div className="workflow-cards">
+            <div className="workflow-card">
+              <div className="step-number">1</div>
+              <div className="card-icon">🎥</div>
+              <h3>Submit Video</h3>
+              <p>Paste any YouTube video URL or ID. Our system accepts both full URLs and video IDs.</p>
+            </div>
+            
+            <div className="workflow-card">
+              <div className="step-number">2</div>
+              <div className="card-icon">🤖</div>
+              <h3>AI Analysis</h3>
+              <p>Our advanced AI analyzes video metadata, engagement metrics, and content patterns.</p>
+            </div>
+            
+            <div className="workflow-card">
+              <div className="step-number">3</div>
+              <div className="card-icon">⛓️</div>
+              <h3>Blockchain Oracle</h3>
+              <p>Results are permanently stored on the Base blockchain for transparency and reliability.</p>
+            </div>
+            
+            <div className="workflow-card">
+              <div className="step-number">4</div>
+              <div className="card-icon">📊</div>
+              <h3>Get Results</h3>
+              <p>Receive detailed virality predictions and content insights backed by blockchain technology.</p>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}

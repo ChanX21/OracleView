@@ -1278,3 +1278,138 @@ h2, h3, h4 {
     margin-left: 0;
   }
 }
+
+/* How It Works Section */
+.how-it-works-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  text-align: center;
+  font-family: var(--font-display);
+  background: linear-gradient(45deg, #ffffff, var(--primary-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+}
+
+.workflow-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  position: relative;
+}
+
+.workflow-cards::before {
+  content: '';
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent,
+    var(--primary-red),
+    transparent
+  );
+  z-index: 0;
+  opacity: 0.3;
+}
+
+.workflow-card {
+  background: rgba(26, 26, 26, 0.8);
+  padding: 30px;
+  border-radius: 20px;
+  position: relative;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 51, 51, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.workflow-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--primary-red);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(255, 51, 51, 0.2);
+}
+
+.step-number {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 30px;
+  height: 30px;
+  background: var(--primary-red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.3);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, var(--primary-red), var(--accent-red));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: float 6s ease-in-out infinite;
+}
+
+.workflow-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  font-family: var(--font-display);
+  background: linear-gradient(45deg, #ffffff, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.workflow-card p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  font-size: 1rem;
+  font-family: var(--font-primary);
+}
+
+/* Add glow effect */
+.workflow-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, 
+    rgba(255, 51, 51, 0.2),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.workflow-card:hover::after {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .workflow-cards::before {
+    display: none;
+  }
+  
+  .workflow-card {
+    margin-bottom: 20px;
+  }
+}
