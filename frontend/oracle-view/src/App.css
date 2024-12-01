@@ -1,5 +1,23 @@
+:root {
+  --primary-red: #ff3333;
+  --dark-red: #cc0000;
+  --accent-red: #ff4d4d;
+  --background-dark: #111111;
+  --card-dark: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --neon-glow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+body {
+  background-color: var(--background-dark);
+  color: var(--text-primary);
+}
+
 .App {
   text-align: center;
+  background-color: var(--background-dark);
+  min-height: 100vh;
 }
 
 .App-logo {
@@ -14,13 +32,13 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  color: white;
+  color: var(--text-primary);
 }
 
 .App-link {
@@ -37,42 +55,68 @@
 }
 
 .analysis-section {
-  background-color: #363b47;
-  padding: 20px;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #1a1a1a, #222222);
+  padding: 25px;
+  border-radius: 15px;
   margin: 20px 0;
   width: 80%;
   max-width: 600px;
+  border: 1px solid #333;
+  box-shadow: 0 4px 20px rgba(255, 51, 51, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analysis-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 25px rgba(255, 51, 51, 0.2);
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 }
 
 input {
-  padding: 10px;
+  padding: 15px;
   font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
+  background: #222222;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-red);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
 }
 
 button {
-  padding: 10px 20px;
+  padding: 12px 25px;
   font-size: 16px;
-  background-color: #61dafb;
+  background: linear-gradient(45deg, var(--primary-red), var(--accent-red));
   border: none;
-  border-radius: 4px;
-  color: #282c34;
+  border-radius: 8px;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
 
-button:hover {
-  background-color: #4fa8c7;
+button:hover:not(:disabled) {
+  background: linear-gradient(45deg, var(--dark-red), var(--primary-red));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 51, 51, 0.4);
+}
+
+button:disabled {
+  background: #333;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .results {
@@ -97,15 +141,18 @@ button:hover {
 }
 
 .wallet-section {
-  margin-bottom: 20px;
-  padding: 10px;
+  margin-bottom: 30px;
+  padding: 15px;
 }
 
 .account-info {
-  background-color: #363b47;
-  padding: 10px 20px;
-  border-radius: 4px;
-  margin: 10px 0;
+  background: linear-gradient(145deg, #1a1a1a, #222222);
+  padding: 12px 25px;
+  border-radius: 10px;
+  border: 1px solid #333;
+  color: var(--primary-red);
+  font-family: monospace;
+  font-size: 1.1rem;
 }
 
 button:disabled {
@@ -115,4 +162,165 @@ button:disabled {
 
 button:disabled:hover {
   background-color: #cccccc;
+}
+
+.results-dashboard {
+  width: 95%;
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 20px;
+  background: rgba(26, 26, 26, 0.7);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.score-card {
+  background: linear-gradient(135deg, #1a1a1a, #222222);
+  padding: 30px;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--primary-red);
+  box-shadow: 0 0 30px rgba(255, 51, 51, 0.2);
+}
+
+.score-value {
+  font-size: 5rem !important;
+  font-weight: bold !important;
+  background: linear-gradient(45deg, var(--primary-red), #ff6666);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: var(--neon-glow);
+}
+
+.virality-label {
+  color: var(--text-primary);
+  font-size: 1.8rem !important;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 15px !important;
+  text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+}
+
+.flame-icon {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: screen;
+}
+
+.virality-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #333;
+  transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+  background-color: var(--primary-red);
+  box-shadow: 0 0 15px var(--primary-red);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes neon-glow {
+  0% { box-shadow: 0 0 5px var(--primary-red), 0 0 10px var(--primary-red); }
+  50% { box-shadow: 0 0 20px var(--primary-red), 0 0 30px var(--primary-red); }
+  100% { box-shadow: 0 0 5px var(--primary-red), 0 0 10px var(--primary-red); }
+}
+
+.keywords-section {
+  background: linear-gradient(145deg, #1a1a1a, #222222);
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #333;
+}
+
+.chart-container {
+  background: linear-gradient(145deg, #1a1a1a, #222222);
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid #333;
+  height: 400px;
+}
+
+.chart-title {
+  color: var(--primary-red) !important;
+  font-size: 1.3rem !important;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Style for tooltips */
+.recharts-tooltip-wrapper {
+  color: white !important;
+}
+
+.recharts-default-tooltip {
+  background-color: rgba(26, 26, 26, 0.9) !important;
+  border: 1px solid var(--primary-red) !important;
+  border-radius: 8px !important;
+}
+
+/* Style for chart labels */
+.recharts-text {
+  fill: var(--text-secondary) !important;
+}
+
+.recharts-label {
+  fill: var(--text-secondary) !important;
+  font-size: 12px !important;
+}
+
+/* Style for pie chart labels */
+.recharts-pie-label-text {
+  fill: var(--text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Style for radar chart lines */
+.recharts-polar-grid-angle line,
+.recharts-polar-grid-concentric circle {
+  stroke: #333 !important;
+}
+
+/* Style for bar chart grid */
+.recharts-cartesian-grid line {
+  stroke: #333 !important;
+}
+
+.recharts-cartesian-axis-line {
+  stroke: #444 !important;
+}
+
+/* Material-UI Chip customization */
+.MuiChip-root {
+  background-color: #222222 !important;
+  border: 1px solid var(--primary-red) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiChip-root:hover {
+  background-color: var(--primary-red) !important;
+  box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
 }
