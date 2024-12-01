@@ -510,11 +510,14 @@ h1::before {
 .info-cards {
   display: flex;
   gap: 20px;
-  margin: 30px 0;
+  margin: 120px auto 30px;
   flex-wrap: wrap;
   justify-content: center;
   width: 90%;
   max-width: 1200px;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .info-card {
@@ -526,6 +529,8 @@ h1::before {
   min-width: 250px;
   max-width: 350px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .info-card:hover {
@@ -770,4 +775,281 @@ h1::before {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   border: 1px solid var(--primary-red);
+}
+
+/* Toast Customization */
+.Toastify__toast {
+  font-family: var(--font-primary);
+  border-radius: 10px !important;
+  padding: 16px !important;
+  background: #1a1a1a !important;
+  color: white !important;
+}
+
+.Toastify__toast-icon {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.Toastify__progress-bar {
+  background: linear-gradient(to right, #ff3333, #ff8f8f) !important;
+}
+
+.Toastify__toast--success {
+  border: 1px solid #4CAF50 !important;
+}
+
+.Toastify__toast--error {
+  border: 1px solid #ff3333 !important;
+}
+
+.Toastify__toast--info {
+  border: 1px solid #3498db !important;
+}
+
+.Toastify__close-button {
+  color: white !important;
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}
+
+/* Base Chain Emphasis Styles */
+.powered-by-base {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  margin-left: 16px;
+  border: 1px solid rgba(0, 0, 255, 0.2);
+}
+
+.base-logo {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.base-icon {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.base-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 255, 0.1);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.base-result-logo {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+.analysis-result.base-chain {
+  border: 2px solid rgba(0, 0, 255, 0.3);
+  background: linear-gradient(145deg, rgba(0, 0, 255, 0.05), rgba(0, 0, 255, 0.02));
+}
+
+.tech-stack .base-icon {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+.tech-stack .base-icon:hover {
+  transform: scale(1.4);
+}
+
+/* Update existing network button styles for Base */
+.network-button[data-network="baseSepolia"] {
+  background: rgba(0, 0, 255, 0.1);
+  border: 1px solid rgba(0, 0, 255, 0.3);
+}
+
+.network-button[data-network="baseSepolia"]:hover {
+  background: rgba(0, 0, 255, 0.2);
+}
+
+.network-button[data-network="baseSepolia"].active {
+  background: rgba(0, 0, 255, 0.3);
+  border-color: rgba(0, 0, 255, 0.5);
+}
+
+/* Header Layout with glow effect */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px 40px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 80px;
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(255, 51, 51, 0.1),
+    0 0 40px rgba(255, 51, 51, 0.05);
+  transition: all 0.3s ease;
+  animation: headerGlow 4s infinite alternate;
+}
+
+.header-container:hover {
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.15),
+    0 0 30px rgba(255, 51, 51, 0.15),
+    0 0 50px rgba(255, 51, 51, 0.1);
+}
+
+/* Add glow animation */
+@keyframes headerGlow {
+  0% {
+    box-shadow: 
+      0 4px 30px rgba(0, 0, 0, 0.1),
+      0 0 20px rgba(255, 51, 51, 0.1),
+      0 0 40px rgba(255, 51, 51, 0.05);
+  }
+  100% {
+    box-shadow: 
+      0 4px 30px rgba(0, 0, 0, 0.15),
+      0 0 30px rgba(255, 51, 51, 0.2),
+      0 0 60px rgba(255, 51, 51, 0.1);
+  }
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Updated Base Badge Styles */
+.powered-by-base {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 87, 255, 0.08);
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 87, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 0 15px rgba(0, 87, 255, 0.1),
+    0 0 30px rgba(0, 87, 255, 0.05);
+  animation: baseGlow 3s infinite alternate;
+}
+
+.powered-by-base:hover {
+  background: rgba(0, 87, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.base-logo {
+  width: 28px;
+  height: 28px;
+  filter: none;
+}
+
+.base-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.powered-by {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.base-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(45deg, #0057FF, #00A3FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Adjust main content padding to account for fixed header */
+.App-header {
+  padding-top: 0;
+  margin-top: 0;
+  position: relative;
+}
+
+/* Make header responsive */
+@media (max-width: 768px) {
+  .header-container {
+    height: auto;
+    padding: 16px;
+  }
+
+  .info-cards {
+    margin-top: 150px;
+    padding: 10px;
+  }
+}
+
+/* Update account info to match the theme */
+.account-info {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Add glow animation */
+@keyframes baseGlow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(0, 87, 255, 0.1),
+      0 0 30px rgba(0, 87, 255, 0.05);
+  }
+  100% {
+    box-shadow: 
+      0 0 25px rgba(0, 87, 255, 0.2),
+      0 0 50px rgba(0, 87, 255, 0.1);
+  }
+}
+
+/* Add glow to wallet section */
+.account-info, .connect-button {
+  /* ... existing styles ... */
+  box-shadow: 
+    0 0 15px rgba(255, 51, 51, 0.1),
+    0 0 30px rgba(255, 51, 51, 0.05);
+  animation: walletGlow 4s infinite alternate;
+}
+
+@keyframes walletGlow {
+  0% {
+    box-shadow: 
+      0 0 15px rgba(255, 51, 51, 0.1),
+      0 0 30px rgba(255, 51, 51, 0.05);
+  }
+  100% {
+    box-shadow: 
+      0 0 25px rgba(255, 51, 51, 0.15),
+      0 0 50px rgba(255, 51, 51, 0.1);
+  }
 }

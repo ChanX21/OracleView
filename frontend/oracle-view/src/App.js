@@ -7,6 +7,11 @@ import metamaskLogo from './assets/metamask.svg';
 import youtubeLogo from './assets/youtube.svg';
 import blockchainIcon from './assets/blockchain.svg';
 import analysisIcon from './assets/analysis.svg';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// Add the Base logo URL as a constant
+const BASE_LOGO_URL = "https://avatars.githubusercontent.com/u/108554348?v=4";
 
 // Network configurations - Only include what's needed for UI
 const NETWORKS = {
@@ -14,13 +19,16 @@ const NETWORKS = {
     name: 'Sepolia',
     chainId: 11155111,
     contractAddress: "0x0f1Ff3ac959035b73b8fcC7a0e6C899f4351313f",
-    icon: "⭐"
+    icon: "⭐",
+    isBase: false
   },
   baseSepolia: {
     name: 'Base Sepolia',
     chainId: 84531,
     contractAddress: "0x6D4CBc827a1EE7D8A6b19e89E08432879C617A61",
-    icon: "🔵"
+    icon: "🔵",
+    isBase: true,
+    logo: BASE_LOGO_URL
   }
 };
 
@@ -116,6 +124,58 @@ function App() {
     cacheProvider: true,
   });
 
+  // Add toast configurations
+  const notify = {
+    success: (msg) => toast.success(msg, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      style: {
+        background: '#1a1a1a',
+        border: '1px solid #4CAF50',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(0, 255, 0, 0.1)'
+      }
+    }),
+    error: (msg) => toast.error(msg, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      style: {
+        background: '#1a1a1a',
+        border: '1px solid #ff3333',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(255, 51, 51, 0.1)'
+      }
+    }),
+    info: (msg) => toast.info(msg, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      style: {
+        background: '#1a1a1a',
+        border: '1px solid #3498db',
+        borderRadius: '10px',
+        boxShadow: '0 4px 12px rgba(52, 152, 219, 0.1)'
+      }
+    })
+  };
+
   // Connect wallet function
   const connectWallet = async () => {
     try {
@@ -133,30 +193,21 @@ function App() {
       const networkName = await provider.getNetwork().then(net => net.name);
       console.log("Network name:", networkName);
 
-      // If it's Base Sepolia, use the specific contract address
+      // Initialize contract based on network
       if (networkName === "Base Sepolia") {
         const baseContract = new ethers.Contract(
-          "0x6D4CBc827a1EE7D8A6b19e89E08432879C617A61", // Base Sepolia contract
+          "0x6D4CBc827a1EE7D8A6b19e89E08432879C617A61",
           CONTRACT_ABI,
           signer
         );
         setContract(baseContract);
-        setSelectedNetwork('baseSepolia');
       } else {
-        // For other networks, use the normal logic
-        const networkConfig = Object.entries(NETWORKS).find(
-          ([_, config]) => config.chainId === network.chainId
-        )?.[0];
-
-        if (networkConfig) {
-          const youtubeAnalyzer = new ethers.Contract(
-            NETWORKS[networkConfig].contractAddress,
-            CONTRACT_ABI,
-            signer
-          );
-          setContract(youtubeAnalyzer);
-          setSelectedNetwork(networkConfig);
-        }
+        const sepoliaContract = new ethers.Contract(
+          "0x0f1Ff3ac959035b73b8fcC7a0e6C899f4351313f",
+          CONTRACT_ABI,
+          signer
+        );
+        setContract(sepoliaContract);
       }
 
       // Listen for network changes
@@ -171,73 +222,73 @@ function App() {
 
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      alert("Error connecting wallet: " + error.message);
+      notify.error("Error connecting wallet: " + error.message);
     }
   };
 
   const handleRequestAnalysis = async (e) => {
     e.preventDefault();
     if (!previewVideoId) {
-      alert("Please enter a valid YouTube URL or video ID");
+      notify.error("Please enter a valid YouTube URL or ID");
       return;
     }
 
     if (!contract) {
-      alert("Please connect your wallet and select a network");
+      notify.error("Please connect your wallet and select a network");
       return;
     }
     
     try {
       console.log("Requesting analysis for:", previewVideoId);
       
-      // First check if analysis already exists
       try {
         const existingAnalysis = await contract.getAnalysis(previewVideoId);
         if (existingAnalysis.exists) {
-          alert("Analysis already exists for this video!");
+          notify.info("Analysis already exists for this video!");
           return;
         }
       } catch (error) {
-        // Expected error if analysis doesn't exist
         console.log("No existing analysis found, proceeding with request");
       }
 
-      // Request new analysis
+      notify.info("Sending transaction...");
       const tx = await contract.requestAnalysis(previewVideoId);
       console.log("Transaction sent:", tx.hash);
       
+      notify.info("Waiting for confirmation...");
       const receipt = await tx.wait();
       console.log("Transaction confirmed:", receipt);
       
-      alert("Analysis requested successfully! Please wait for the oracle to process it.");
+      notify.success("Analysis requested successfully! Please wait for the oracle to process it.");
       setVideoId('');
       setPreviewVideoId(null);
     } catch (error) {
       console.error('Error requesting analysis:', error);
-      alert("Error requesting analysis: " + (error.reason || error.message));
+      notify.error("Error requesting analysis: " + (error.reason || error.message));
     }
   };
 
   const handleGetAnalysis = async (e) => {
     e.preventDefault();
     if (!searchPreviewId) {
-      alert("Please enter a valid YouTube URL or video ID");
+      notify.error("Please enter a valid YouTube URL or ID");
       return;
     }
 
     if (!contract) {
-      alert("Please connect your wallet and select a network");
+      notify.error("Please connect your wallet and select a network");
       return;
     }
     
     try {
+      notify.info("Fetching analysis...");
       console.log("Getting analysis for:", searchPreviewId);
       
       const result = await contract.getAnalysis(searchPreviewId);
       console.log("Analysis result:", result);
 
       if (!result.exists) {
-        alert("No analysis found for this video. Please request an analysis first.");
+        notify.info("No analysis found for this video. Please request an analysis first.");
         return;
       }
 
@@ -247,12 +298,13 @@ function App() {
         exists: result.exists,
         network: selectedNetwork
       });
+      notify.success("Analysis retrieved successfully!");
     } catch (error) {
       console.error('Error getting analysis:', error);
       if (error.message.includes("revert")) {
-        alert("No analysis found for this video. Please request an analysis first.");
+        notify.info("No analysis found for this video. Please request an analysis first.");
       } else {
-        alert("Error getting analysis: " + (error.reason || error.message));
+        notify.error("Error getting analysis: " + (error.reason || error.message));
       }
       setAnalysisResult(null);
     }
@@ -271,82 +323,54 @@ function App() {
     }
   };
 
-  // Move switchNetwork inside App component
-  const switchNetwork = async (networkName) => {
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-
-      // If switching to Base Sepolia, just use the specific contract
-      if (networkName === 'Base Sepolia') {
-        const baseContract = new ethers.Contract(
-          "0x6D4CBc827a1EE7D8A6b19e89E08432879C617A61",
-          CONTRACT_ABI,
-          signer
-        );
-        setContract(baseContract);
-        setSelectedNetwork(networkName);
-      } else {
-        // For other networks, use the normal logic
-        const networkConfig = NETWORKS[networkName];
-        const newContract = new ethers.Contract(
-          networkConfig.contractAddress,
-          CONTRACT_ABI,
-          signer
-        );
-        setContract(newContract);
-        setSelectedNetwork(networkName);
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
-      alert(`Failed to switch contracts: ${error.message}`);
-    }
-  };
-
-  // Add network selector component
-  const NetworkSelector = () => (
-    <div className="network-selector">
-      <h3>Select Network</h3>
-      <div className="network-buttons">
-        {Object.entries(NETWORKS).map(([key, network]) => (
-          <button
-            key={key}
-            onClick={() => switchNetwork(key)}
-            className={`network-button ${selectedNetwork === key ? 'active' : ''}`}
-          >
-            {network.icon} {network.name}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="App">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      
       <header className="App-header">
-        <div className="logo-container">
-          <div className="logo-symbol"></div>
-          <h1 className="logo">Oracle View</h1>
-        </div>
-        
-        {/* Rich Wallet Connection Section */}
-        <div className="wallet-section">
-          {account ? (
-            <div className="account-info">
-              <img src={metamaskLogo} alt="MetaMask" className="wallet-icon" />
-              <p>Connected: {account.slice(0, 6)}...{account.slice(-4)}</p>
-            </div>
-          ) : (
-            <button onClick={connectWallet} className="connect-button">
-              <img src={metamaskLogo} alt="MetaMask" className="wallet-icon" />
-              Connect Wallet
-            </button>
-          )}
-        </div>
+        <div className="header-container">
+          {/* Left side: Logo and Title */}
+          <div className="logo-container">
+            <div className="logo-symbol"></div>
+            <h1 className="logo">Oracle View</h1>
+          </div>
 
-        {/* Add NetworkSelector after wallet connection */}
-        {account && <NetworkSelector />}
+          {/* Right side: Base Badge and Wallet */}
+          <div className="header-right">
+            <div className="powered-by-base">
+              <img src={BASE_LOGO_URL} alt="Base" className="base-logo" />
+              <div className="base-text">
+                <span className="powered-by">POWERED BY</span>
+                <span className="base-name">BASE</span>
+              </div>
+            </div>
+            
+            <div className="wallet-section">
+              {account ? (
+                <div className="account-info">
+                  <img src={metamaskLogo} alt="MetaMask" className="wallet-icon" />
+                  <p>Connected: {account.slice(0, 6)}...{account.slice(-4)}</p>
+                </div>
+              ) : (
+                <button onClick={connectWallet} className="connect-button">
+                  <img src={metamaskLogo} alt="MetaMask" className="wallet-icon" />
+                  Connect Wallet
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Info Cards */}
         <div className="info-cards">
@@ -435,7 +459,13 @@ function App() {
 
             {/* Display results with network indicator */}
             {analysisResult && (
-              <div className="analysis-result">
+              <div className={`analysis-result ${analysisResult.network === 'baseSepolia' ? 'base-chain' : ''}`}>
+                {analysisResult.network === 'baseSepolia' && (
+                  <div className="base-indicator">
+                    <img src={BASE_LOGO_URL} alt="Base Chain" className="base-result-logo" />
+                    <span>Analyzed on Base Chain</span>
+                  </div>
+                )}
                 <ScoreDisplay 
                   score={analysisResult.score} 
                   metadata={analysisResult.metadata}
@@ -452,12 +482,13 @@ function App() {
               <h4>Powered By</h4>
               <div className="tech-stack">
                 <img src={metamaskLogo} alt="MetaMask" className="tech-icon" />
+                <img src={BASE_LOGO_URL} alt="Base" className="tech-icon base-icon" />
                 <img src={blockchainIcon} alt="Blockchain" className="tech-icon" />
               </div>
             </div>
             <div className="footer-section">
               <h4>About Oracle View</h4>
-              <p>Decentralized YouTube content analysis platform</p>
+              <p>Decentralized YouTube content analysis platform on Base</p>
             </div>
           </div>
         </footer>
