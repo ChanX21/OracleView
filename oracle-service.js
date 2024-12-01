@@ -2,9 +2,9 @@ const ethers = require('ethers');
 const axios = require('axios');
 require('dotenv').config();
 
-// Contract ABI - import the compiled contract ABI
-const CONTRACT_ABI = require('./artifacts/contracts/YoutubeAnalyzer.sol/YoutubeAnalyzer.json').abi;
-const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS';
+// Import ABI from the abi file
+const CONTRACT_ABI = require('./abi/abi.js');
+const CONTRACT_ADDRESS = '0x62cdDA352b47D60B46fdf510BCBC1bd430DCb691';
 
 // Initialize provider and wallet
 const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
@@ -27,11 +27,17 @@ async function processAnalysisRequest(videoId) {
         const [metadata, scoreStr] = response.data.data.split('|');
         const score = parseInt(scoreStr);
 
+        console.log('Submitting to blockchain:', {
+            videoId,
+            metadata,
+            score
+        });
+
         // Submit to blockchain
         const tx = await contract.submitAnalysis(videoId, metadata, score);
-        await tx.wait();
-
-        console.log(`Analysis submitted for video ${videoId}`);
+        const receipt = await tx.wait();
+        
+        console.log(`Analysis submitted for video ${videoId}. Transaction hash: ${receipt.transactionHash}`);
     } catch (error) {
         console.error('Error processing analysis:', error);
     }
@@ -40,19 +46,45 @@ async function processAnalysisRequest(videoId) {
 // Listen for AnalysisRequested events
 async function startListening() {
     console.log('Starting to listen for AnalysisRequested events...');
+    console.log('Contract address:', CONTRACT_ADDRESS);
+    console.log('Oracle address:', await contract.oracleAddress());
 
     contract.on('AnalysisRequested', async (videoId, timestamp, event) => {
-        console.log(`New analysis request for video: ${videoId}`);
+        console.log(`New analysis request received:`);
+        console.log(`- Video ID: ${videoId}`);
+        console.log(`- Timestamp: ${new Date(timestamp * 1000).toISOString()}`);
+        console.log(`- Transaction Hash: ${event.transactionHash}`);
         await processAnalysisRequest(videoId);
+    });
+
+    // Also listen for AnalysisReceived events
+    contract.on('AnalysisReceived', async (videoId, metadata, score, event) => {
+        console.log(`Analysis received on chain:`);
+        console.log(`- Video ID: ${videoId}`);
+        console.log(`- Metadata: ${metadata}`);
+        console.log(`- Score: ${score}`);
+        console.log(`- Transaction Hash: ${event.transactionHash}`);
     });
 }
 
 // Example script to request analysis
 async function requestAnalysis(videoId) {
-    const tx = await contract.requestAnalysis(videoId);
-    await tx.wait();
-    console.log(`Analysis requested for video ${videoId}`);
+    try {
+        const tx = await contract.requestAnalysis(videoId);
+        const receipt = await tx.wait();
+        console.log(`Analysis requested for video ${videoId}`);
+        console.log(`Transaction hash: ${receipt.transactionHash}`);
+    } catch (error) {
+        console.error('Error requesting analysis:', error);
+    }
 }
 
 // Start the oracle service
-startListening().catch(console.error); 
+console.log('Starting Oracle Service...');
+startListening().catch(console.error);
+
+// Export for testing purposes
+module.exports = {
+    requestAnalysis,
+    processAnalysisRequest
+}; 
