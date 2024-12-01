@@ -1413,3 +1413,114 @@ h2, h3, h4 {
     margin-bottom: 20px;
   }
 }
+
+/* Transaction Popup Styles */
+.transaction-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.transaction-content {
+  background: linear-gradient(145deg, #1a1a1a, #222222);
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 87, 255, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  box-shadow: 
+    0 0 30px rgba(0, 87, 255, 0.2),
+    0 0 60px rgba(0, 87, 255, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+.popup-base-logo {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+.transaction-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.pulse-animation {
+  width: 12px;
+  height: 12px;
+  background: #0057FF;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+.view-explorer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 87, 255, 0.1);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  text-decoration: none;
+  margin: 20px 0;
+  border: 1px solid rgba(0, 87, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.view-explorer-btn:hover {
+  background: rgba(0, 87, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.view-explorer-btn:hover .arrow {
+  transform: translateX(5px);
+}
+
+.close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}

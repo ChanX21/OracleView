@@ -107,6 +107,36 @@ const ScoreDisplay = ({ score, metadata }) => {
   );
 };
 
+// Add this component after your other component definitions
+const TransactionPopup = ({ txHash, onClose }) => {
+  const baseExplorerUrl = "https://sepolia.basescan.org/tx/";
+  
+  return (
+    <div className="transaction-popup">
+      <div className="transaction-content">
+        <img src={BASE_LOGO_URL} alt="Base" className="popup-base-logo" />
+        <h3>Transaction Submitted!</h3>
+        <div className="transaction-status">
+          <div className="pulse-animation"></div>
+          <p>Transaction is being processed on Base</p>
+        </div>
+        <a 
+          href={`${baseExplorerUrl}${txHash}`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="view-explorer-btn"
+        >
+          View on Base Explorer
+          <span className="arrow">→</span>
+        </a>
+        <button onClick={onClose} className="close-btn">
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [videoId, setVideoId] = useState('');
   const [searchVideoId, setSearchVideoId] = useState('');
@@ -118,6 +148,7 @@ function App() {
   const [selectedNetwork, setSelectedNetwork] = useState('sepolia');
   const [chainId, setChainId] = useState(null);
   const [multiChainResults, setMultiChainResults] = useState({});
+  const [txHash, setTxHash] = useState(null);
 
   // Initialize Web3Modal
   const web3Modal = new Web3Modal({
@@ -203,7 +234,7 @@ function App() {
         setContract(baseContract);
       } else {
         const sepoliaContract = new ethers.Contract(
-          "0x0f1Ff3ac959035b73b8fcC7a0e6C899f4351313f",
+          "0x6D4CBc827a1EE7D8A6b19e89E08432879C617A61",
           CONTRACT_ABI,
           signer
         );
@@ -254,6 +285,8 @@ function App() {
       notify.info("Sending transaction...");
       const tx = await contract.requestAnalysis(previewVideoId);
       console.log("Transaction sent:", tx.hash);
+      
+      setTxHash(tx.hash); // Show popup
       
       notify.info("Waiting for confirmation...");
       const receipt = await tx.wait();
@@ -343,7 +376,10 @@ function App() {
           {/* Left side: Logo and Title */}
           <div className="logo-container">
             <div className="logo-symbol"></div>
-            <h1 className="logo">Oracle View</h1>
+            <div className="logo-text">
+              <h1 className="logo">Oracle View</h1>
+              <span className="tagline">AI-Powered Oracle for Viral Predictions</span>
+            </div>
           </div>
 
           {/* Right side: Base Badge and Wallet */}
@@ -527,6 +563,7 @@ function App() {
           </div>
         </footer>
       </header>
+      {txHash && <TransactionPopup txHash={txHash} onClose={() => setTxHash(null)} />}
     </div>
   );
 }
