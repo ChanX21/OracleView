@@ -1,9 +1,45 @@
 const express = require('express');
 const axios = require('axios');
+const ethers = require('ethers');
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
+
+// Network configurations (same as oracle-service.js)
+const NETWORKS = {
+    sepolia: {
+        name: 'Sepolia',
+        rpc: process.env.SEPOLIA_RPC_URL,
+        contractAddress: process.env.SEPOLIA_CONTRACT_ADDRESS,
+        chainId: 11155111
+    },
+    base: {
+        name: 'Base',
+        rpc: process.env.BASE_RPC_URL,
+        contractAddress: process.env.BASE_CONTRACT_ADDRESS,
+        chainId: 84531  // Base Testnet
+    }
+};
+
+// Initialize providers and contracts
+const networkConnections = {};
+
+for (const [networkName, networkConfig] of Object.entries(NETWORKS)) {
+    try {
+        const provider = new ethers.providers.JsonRpcProvider(networkConfig.rpc);
+        const contract = new ethers.Contract(
+            networkConfig.contractAddress,
+            require('./abi/abi.js'),
+            provider
+        );
+
+        networkConnections[networkName] = { provider, contract, config: networkConfig };
+        console.log(`✅ Connected to ${networkName}`);
+    } catch (error) {
+        console.error(`❌ Failed to setup ${networkName}:`, error);
+    }
+}
 
 const videoAnalysis = async (videoId) => {
     try {
@@ -129,6 +165,76 @@ const videoAnalysis = async (videoId) => {
     }
 };
 
+// Add new endpoint to get analysis from all chains
+app.get('/analysis/:videoId/all-chains', async (req, res) => {
+    try {
+        const { videoId } = req.params;
+        const results = {};
+
+        for (const [networkName, connection] of Object.entries(networkConnections)) {
+            try {
+                const analysis = await connection.contract.getAnalysis(videoId);
+                results[networkName] = {
+                    metadata: analysis.metadata,
+                    score: analysis.score.toNumber(),
+                    exists: analysis.exists,
+                    chainId: connection.config.chainId
+                };
+            } catch (error) {
+                console.error(`Error fetching from ${networkName}:`, error);
+                results[networkName] = { 
+                    error: 'Failed to fetch analysis',
+                    exists: false 
+                };
+            }
+        }
+
+        res.json({
+            success: true,
+            data: results
+        });
+    } catch (error) {
+        console.error('Error in cross-chain analysis:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch cross-chain analysis'
+        });
+    }
+});
+
+// Add endpoint to get analysis from specific chain
+app.get('/analysis/:videoId/:network', async (req, res) => {
+    try {
+        const { videoId, network } = req.params;
+        
+        if (!networkConnections[network]) {
+            return res.status(400).json({
+                success: false,
+                error: `Network ${network} not supported`
+            });
+        }
+
+        const contract = networkConnections[network].contract;
+        const analysis = await contract.getAnalysis(videoId);
+
+        res.json({
+            success: true,
+            data: {
+                metadata: analysis.metadata,
+                score: analysis.score.toNumber(),
+                exists: analysis.exists,
+                chainId: networkConnections[network].config.chainId
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching analysis:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch analysis'
+        });
+    }
+});
+
 // API endpoint with additional error handling
 app.post('/analyze-video', async (req, res) => {
     try {
@@ -165,5 +271,6 @@ app.post('/analyze-video', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log('Supported networks:', Object.keys(networkConnections).join(', '));
 }); 

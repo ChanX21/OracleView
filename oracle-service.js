@@ -4,87 +4,135 @@ require('dotenv').config();
 
 // Import ABI from the abi file
 const CONTRACT_ABI = require('./abi/abi.js');
-const CONTRACT_ADDRESS = '0x62cdDA352b47D60B46fdf510BCBC1bd430DCb691';
 
-// Initialize provider and wallet
-const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, wallet);
+// Network configurations
+const NETWORKS = {
+    sepolia: {
+        name: 'Sepolia',
+        rpc: process.env.SEPOLIA_RPC_URL,
+        contractAddress: process.env.SEPOLIA_CONTRACT_ADDRESS,
+        chainId: 11155111
+    },
+    base: {
+        name: 'Base',
+        rpc: process.env.BASE_RPC_URL,
+        contractAddress: process.env.BASE_CONTRACT_ADDRESS,
+        chainId: 84531  // Base Testnet
+    }
+};
 
-async function processAnalysisRequest(videoId) {
-    try {
-        // Call our API
-        const response = await axios.post('http://localhost:3000/analyze-video', {
-            videoId: videoId
-        });
+class OracleService {
+    constructor() {
+        this.networks = {};
+        this.setupNetworks();
+    }
 
-        if (!response.data.success) {
-            console.error('API Error:', response.data.error);
+    setupNetworks() {
+        for (const [networkName, networkConfig] of Object.entries(NETWORKS)) {
+            try {
+                const provider = new ethers.providers.JsonRpcProvider(networkConfig.rpc);
+                const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+                const contract = new ethers.Contract(networkConfig.contractAddress, CONTRACT_ABI, wallet);
+
+                this.networks[networkName] = {
+                    provider,
+                    wallet,
+                    contract,
+                    config: networkConfig
+                };
+
+                console.log(`✅ Connected to ${networkName}`);
+            } catch (error) {
+                console.error(`❌ Failed to setup ${networkName}:`, error);
+            }
+        }
+    }
+
+    async processAnalysisRequest(videoId, networkName) {
+        const network = this.networks[networkName];
+        if (!network) {
+            console.error(`Network ${networkName} not configured`);
             return;
         }
 
-        // Parse the response
-        const [metadata, scoreStr] = response.data.data.split('|');
-        const score = parseInt(scoreStr);
+        try {
+            console.log(`Processing analysis for video ${videoId} on ${networkName}`);
+            
+            // Call our API
+            const response = await axios.post('http://localhost:3000/analyze-video', {
+                videoId: videoId
+            });
 
-        console.log('Submitting to blockchain:', {
-            videoId,
-            metadata,
-            score
-        });
+            if (!response.data.success) {
+                throw new Error(response.data.error || 'API request failed');
+            }
 
-        // Submit to blockchain
-        const tx = await contract.submitAnalysis(videoId, metadata, score);
-        const receipt = await tx.wait();
-        
-        console.log(`Analysis submitted for video ${videoId}. Transaction hash: ${receipt.transactionHash}`);
-    } catch (error) {
-        console.error('Error processing analysis:', error);
+            // Parse the response
+            const [metadata, scoreStr] = response.data.data.split('|');
+            const score = parseInt(scoreStr);
+
+            console.log(`Submitting analysis to ${networkName}:`, {
+                videoId,
+                metadata,
+                score
+            });
+
+            // Submit to blockchain
+            const tx = await network.contract.submitAnalysis(videoId, metadata, score);
+            const receipt = await tx.wait();
+            
+            console.log(`✅ Analysis submitted on ${networkName}. Hash: ${receipt.transactionHash}`);
+            return receipt;
+        } catch (error) {
+            console.error(`❌ Error processing analysis on ${networkName}:`, error);
+            throw error;
+        }
+    }
+
+    async startListening() {
+        console.log('🚀 Starting Oracle Service on multiple networks...');
+
+        for (const [networkName, network] of Object.entries(this.networks)) {
+            try {
+                console.log(`📡 Listening on ${networkName}...`);
+                console.log(`Contract address: ${network.config.contractAddress}`);
+
+                // Listen for AnalysisRequested events
+                network.contract.on('AnalysisRequested', async (videoId, timestamp, event) => {
+                    console.log(`\n🎥 New analysis request on ${networkName}:`);
+                    console.log(`Video ID: ${videoId}`);
+                    console.log(`Timestamp: ${new Date(timestamp * 1000).toISOString()}`);
+                    console.log(`TX Hash: ${event.transactionHash}`);
+
+                    try {
+                        await this.processAnalysisRequest(videoId, networkName);
+                    } catch (error) {
+                        console.error(`Failed to process request on ${networkName}:`, error);
+                    }
+                });
+
+                // Listen for AnalysisReceived events
+                network.contract.on('AnalysisReceived', async (videoId, metadata, score, event) => {
+                    console.log(`\n📊 Analysis completed on ${networkName}:`);
+                    console.log(`Video ID: ${videoId}`);
+                    console.log(`Score: ${score}`);
+                    console.log(`TX Hash: ${event.transactionHash}`);
+                });
+
+            } catch (error) {
+                console.error(`❌ Failed to setup listeners for ${networkName}:`, error);
+            }
+        }
+    }
+
+    // Helper method to get contract instance for a specific network
+    getContract(networkName) {
+        return this.networks[networkName]?.contract;
     }
 }
 
-// Listen for AnalysisRequested events
-async function startListening() {
-    console.log('Starting to listen for AnalysisRequested events...');
-    console.log('Contract address:', CONTRACT_ADDRESS);
-    console.log('Oracle address:', await contract.oracleAddress());
+// Create and start the service
+const service = new OracleService();
+service.startListening().catch(console.error);
 
-    contract.on('AnalysisRequested', async (videoId, timestamp, event) => {
-        console.log(`New analysis request received:`);
-        console.log(`- Video ID: ${videoId}`);
-        console.log(`- Timestamp: ${new Date(timestamp * 1000).toISOString()}`);
-        console.log(`- Transaction Hash: ${event.transactionHash}`);
-        await processAnalysisRequest(videoId);
-    });
-
-    // Also listen for AnalysisReceived events
-    contract.on('AnalysisReceived', async (videoId, metadata, score, event) => {
-        console.log(`Analysis received on chain:`);
-        console.log(`- Video ID: ${videoId}`);
-        console.log(`- Metadata: ${metadata}`);
-        console.log(`- Score: ${score}`);
-        console.log(`- Transaction Hash: ${event.transactionHash}`);
-    });
-}
-
-// Example script to request analysis
-async function requestAnalysis(videoId) {
-    try {
-        const tx = await contract.requestAnalysis(videoId);
-        const receipt = await tx.wait();
-        console.log(`Analysis requested for video ${videoId}`);
-        console.log(`Transaction hash: ${receipt.transactionHash}`);
-    } catch (error) {
-        console.error('Error requesting analysis:', error);
-    }
-}
-
-// Start the oracle service
-console.log('Starting Oracle Service...');
-startListening().catch(console.error);
-
-// Export for testing purposes
-module.exports = {
-    requestAnalysis,
-    processAnalysisRequest
-}; 
+module.exports = service; 

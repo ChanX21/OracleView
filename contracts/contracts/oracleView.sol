@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract YoutubeAnalyzer is Ownable {
+contract OracleView is Ownable {
     // Events
     event AnalysisRequested(string videoId, uint256 timestamp);
     event AnalysisReceived(string videoId, string metadata, uint256 score);
