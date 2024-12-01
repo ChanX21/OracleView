@@ -4,7 +4,7 @@ import Web3Modal from 'web3modal';
 import './App.css';
 
 // You'll need to import your contract ABI and address
-const CONTRACT_ADDRESS = "YOUR_CONTRACT_ADDRESS_HERE";
+const CONTRACT_ADDRESS = "0x62cdDA352b47D60B46fdf510BCBC1bd430DCb691";
 const CONTRACT_ABI = [
   "function requestAnalysis(string calldata videoId) external",
   "function getAnalysis(string calldata videoId) external view returns (string memory metadata, uint256 score, bool exists)"
