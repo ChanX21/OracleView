@@ -1,32 +1,40 @@
-# 🔮 Oracle View
+# Oracle View
 
-<div align="center">
-  <h3>Decentralized YouTube Content Analysis Oracle</h3>
-  <p>AI-Powered Video Virality Prediction on the Blockchain</p>
-</div>
+A Decentralized YouTube Content Analysis Oracle
 
-## 🌟 Overview
+## Overview
 
-Oracle View is a decentralized oracle system that leverages AI to analyze YouTube videos and predict their viral potential. By combining blockchain technology with advanced AI analysis, it provides transparent and immutable content analysis for content creators and marketers.
+Oracle View is a sophisticated decentralized oracle system that combines artificial intelligence with blockchain technology to analyze and predict YouTube video virality. Built on Base Chain, it provides content creators and marketers with transparent, immutable, and AI-powered content analysis.
 
-## ✨ Key Features
+## Core Features
 
-- 🎥 **Smart URL Handling**: Analyze videos using URLs or video IDs
-- 🤖 **AI Analysis**: GPT-powered content evaluation
-- 📊 **Virality Scoring**: 0-100 scoring system with detailed metadata
-- ⛓️ **Blockchain Integration**: Transparent and immutable results
-- 🔄 **Real-time Preview**: Instant YouTube video previews
-- 🎯 **Rate Limiting**: Smart contract-based request management
+- **Smart URL Processing**: Seamlessly handle both YouTube URLs and video IDs
+- **Advanced AI Analysis**: Powered by GPT for comprehensive content evaluation
+- **Virality Metrics**: Precise scoring system (0-100) with detailed metadata
+- **Blockchain Integration**: Immutable storage of analysis results
+- **Interactive Preview**: Real-time YouTube video embedding
+- **Request Management**: Smart contract-based rate limiting
 
-## 🛠️ Tech Stack
+## Technical Architecture
 
-- **Frontend**: React.js, Web3.js, Material-UI
-- **Smart Contracts**: Solidity (^0.8.19)
-- **Backend**: Node.js, Express
-- **AI**: OpenAI GPT-3.5
-- **APIs**: YouTube Data API v3
-- **Network**: Ethereum (Sepolia)
+### Frontend
+- React.js with Web3 integration
+- Material-UI components
+- Real-time blockchain state management
+- Responsive design system
 
-## 🚀 Quick Start
+### Smart Contracts
+- Solidity (^0.8.19)
+- OpenZeppelin security standards
+- Multi-chain deployment (Base Sepolia, Sepolia)
+- Gas-optimized operations
+
+### Backend
+- Node.js/Express server
+- YouTube Data API integration
+- OpenAI GPT-3.5 implementation
+- RESTful API architecture
+
+## Quick Start
 
 ### Prerequisites
